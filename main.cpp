@@ -39,6 +39,48 @@ bool isSameTeam(char piece1, char piece2){
 	return isupper(piece1) == isupper(piece2);
 }
 
+bool validRookMove(char board[8][8], Position origin, Position target){
+	bool squareBusy = false;
+	if((origin.row == target.row && origin.column != target.column) || (origin.column == target.column && origin.row != target.row)) {
+		if(origin.row == target.row && origin.column != target.column) {
+			int direction = (target.column > origin.column) ? 1 : -1;
+			int distance = abs(target.column - origin.column);
+			for(int i = 1; i <= distance - 1; i++) {
+				if(board[origin.row][origin.column + i * direction] != ' '){
+					squareBusy = true;
+				}
+			}
+		}
+		if(origin.column == target.column && origin.row != target.row) {
+			int direction = (target.row > origin.row) ? 1 : -1;
+			int distance = abs(target.row - origin.row);
+			for(int i = 1; i <= distance - 1; i++) {
+				if(board[origin.row + i * direction][origin.column] != ' '){
+					squareBusy = true;
+				}
+			}
+		}
+		return !squareBusy;
+	}
+	return false;
+}
+
+bool validBishopMove(char board[8][8] , Position origin, Position target) {
+	bool squareBusy = false;
+	if(abs(origin.row - target.row) == abs(origin.column - target.column)) {
+		int directionRow = (target.row > origin.row) ? 1 : -1;
+		int directionCol = (target.column > origin.column) ? 1 : -1;
+		int distance = abs(target.row - origin.row);
+		for(int i = 1; i <= distance - 1; i++){
+			if(board[origin.row + i * directionRow][origin.column + i * directionCol] != ' ') {
+				squareBusy = true;
+			}
+		}
+		return !squareBusy;
+	}
+	return false;
+}
+
 bool validMove(char board[8][8], Position origin, Position target) {
 	if(!isInsideBoard(origin) || !isInsideBoard(target)){
 		return false;
@@ -64,15 +106,33 @@ bool validMovePiece(char board[8][8], Position origin, Position target){
 					return true;
 				}
 			}
+			return false;
 		case 'p':
-		if(board[target.row][target.column] == ' '){
-			if(origin.column == target.column && origin.row == 1 && (target.row == 2 || (target.row == 3 && board[2][target.column] == ' '))) {
-				return true;
-			} 
-			if(origin.row > 1 && target.row <= 7 && target.row - origin.row == 1 && origin.column == target.column) {
+			if(board[target.row][target.column] == ' '){
+				if(origin.column == target.column && origin.row == 1 && (target.row == 2 || (target.row == 3 && board[2][target.column] == ' '))) {
+					return true;
+				} 
+				if(origin.row > 1 && target.row <= 7 && target.row - origin.row == 1 && origin.column == target.column) {
+					return true;
+				}
+			}
+			return false;
+		case 'R':
+		case 'r':
+			return validRookMove(board, origin, target);
+		case 'B':
+		case 'b':
+			return validBishopMove(board, origin, target);
+		case 'Q':
+		case 'q':
+			return validRookMove(board, origin, target) || validBishopMove(board, origin, target);
+		case 'N':
+		case 'n':
+			if((abs(origin.row - target.row) == 2 && abs(origin.column - target.column) == 1) || (abs(origin.row - target.row) == 1 && abs(origin.column - target.column) == 2)) {
 				return true;
 			}
-		}
+			return false;
+
 		default: 
 			return false;
 	}
@@ -92,7 +152,7 @@ int main() {
 	printBoard(board);
 	Position origen = {.column = 4, .row = 6};  // e2
 	Position destino = {.column = 4, .row = 4}; // e4
-	if(validMove(board, origen, destino)){
+	if(validMove(board, origen, destino) && validMovePiece(board, origen, destino)){
 		movePiece(board, origen, destino);
 	}
 	printBoard(board);
