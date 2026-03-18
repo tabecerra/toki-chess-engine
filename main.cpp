@@ -132,7 +132,15 @@ bool validMovePiece(char board[8][8], Position origin, Position target){
 				return true;
 			}
 			return false;
-
+		case 'K':
+		case 'k':
+			if(abs(origin.row - target.row) <= 1 && abs(origin.column - target.column) <= 1) {
+				return true;
+			}
+			if(origin.row == target.row && origin.column == target.column) {
+				return false;
+			}
+			return false;
 		default: 
 			return false;
 	}
