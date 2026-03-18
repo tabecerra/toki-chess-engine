@@ -106,6 +106,14 @@ bool validMovePiece(char board[8][8], Position origin, Position target){
 					return true;
 				}
 			}
+			if(board[target.row][target.column] != ' '){
+				if(origin.row - 1 == target.row && origin.column - 1 == target.column){
+					return true;
+				}
+				if(origin.row - 1 == target.row && origin.column + 1 == target.column){
+					return true;
+				}
+			}
 			return false;
 		case 'p':
 			if(board[target.row][target.column] == ' '){
@@ -113,6 +121,14 @@ bool validMovePiece(char board[8][8], Position origin, Position target){
 					return true;
 				} 
 				if(origin.row > 1 && target.row <= 7 && target.row - origin.row == 1 && origin.column == target.column) {
+					return true;
+				}
+			}
+			if(board[target.row][target.column] != ' '){
+				if(origin.row + 1 == target.row && origin.column - 1 == target.column){
+					return true;
+				}
+				if(origin.row + 1 == target.row && origin.column + 1 == target.column){
 					return true;
 				}
 			}
