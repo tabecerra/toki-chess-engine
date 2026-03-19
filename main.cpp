@@ -186,8 +186,10 @@ int main() {
 	int cont = 0;
 	string input = "";
 	Position origen, destino;
+	
 	while (!gameOver) {
-		if(cont % 2 == 0){
+		char currentKing = (cont % 2 == 0) ? 'K' : 'k';
+		if(currentKing == 'K'){
 			cout << "Juegan las BLANCAS\n";
 		} else {
 			cout << "Juegan las NEGRAS\n";
@@ -196,13 +198,12 @@ int main() {
 		cin >> input;
 		origen = parsePosition(input);
 
-		if(origen.row > 7 || origen.row < 0 || origen.column > 7 || origen.column < 0 || board[origen.row][origen.column] == ' '){
+		if(!isInsideBoard(origen) || board[origen.row][origen.column] == ' '){
 			cout << "La posicion de origen seleccionada no se encuentra dentro del tablero o no contiene ninguna pieza\n";
 			continue;
 		}
 
-		if((cont % 2 == 0 && !isupper(board[origen.row][origen.column])) || 
-		   (cont % 2 == 1 && isupper(board[origen.row][origen.column]))){
+		if(!isSameTeam(board[origen.row][origen.column], currentKing)){
 			cout << "No puedes mover una ficha del contrincante\n";
 			continue;
 		}
