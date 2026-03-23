@@ -170,6 +170,28 @@ bool validMovePiece(char board[8][8], Position origin, Position target){
 	}
 }
 
+bool isInCheck(char board[8][8], char currentKing){
+	Position kingPos;
+	bool inCheck = false;
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(board[i][j] == currentKing){
+				kingPos = {j, i};
+			}
+		}
+	}
+
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(validMove(board, {j, i}, kingPos) && validMovePiece(board, {j, i}, kingPos)){
+				inCheck = true;
+			}
+		}
+	}
+	
+	return inCheck;
+}
+
 int main() {
 	char board[8][8] = {
 		{'r','n','b','q','k','b','n','r'},
@@ -189,6 +211,12 @@ int main() {
 	
 	while (!gameOver) {
 		char currentKing = (cont % 2 == 0) ? 'K' : 'k';
+		char lastBoard[8][8];
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				lastBoard[i][j] = board[i][j];
+			}
+		}
 		if(currentKing == 'K'){
 			cout << "Juegan las BLANCAS\n";
 		} else {
@@ -216,6 +244,16 @@ int main() {
 			movePiece(board, origen, destino);
 		} else {
 			cout << "Movimiento invalido\n";
+			continue;
+		}
+
+		if(isInCheck(board, currentKing)){
+			for(int i = 0; i < 8; i++){
+				for(int j = 0; j < 8; j++){
+					board[i][j] = lastBoard[i][j];
+				}
+			}
+			cout << "Ese movimiento no es posible porque se produce un jaque\n";
 			continue;
 		}
 
