@@ -1,3 +1,4 @@
+#include <cctype>
 #include <iostream>
 
 using namespace std;
@@ -22,6 +23,13 @@ struct Position {
 	int column;
 	int row;
 };
+
+Position parsePosition(string input){
+	int column = input[0] - 'a';
+	int row = 8 - (input[1] - '0'); 
+	Position target = {column, row};
+	return target;
+}
 
 void movePiece(char board[8][8], Position origin, Position target) {
 	board[target.row][target.column] = board[origin.row][origin.column];
@@ -174,11 +182,46 @@ int main() {
 		{'R','N','B','Q','K','B','N','R'}
 	};
 	printBoard(board);
-	Position origen = {.column = 4, .row = 6};  // e2
-	Position destino = {.column = 4, .row = 4}; // e4
-	if(validMove(board, origen, destino) && validMovePiece(board, origen, destino)){
-		movePiece(board, origen, destino);
+	bool gameOver = false;
+	int cont = 0;
+	string input = "";
+	Position origen, destino;
+	
+	while (!gameOver) {
+		char currentKing = (cont % 2 == 0) ? 'K' : 'k';
+		if(currentKing == 'K'){
+			cout << "Juegan las BLANCAS\n";
+		} else {
+			cout << "Juegan las NEGRAS\n";
+		}
+		cout << "Ingrese la posicion de la pieza que quiere mover (Ej.: e2)\n";	
+		cin >> input;
+		origen = parsePosition(input);
+
+		if(!isInsideBoard(origen) || board[origen.row][origen.column] == ' '){
+			cout << "La posicion de origen seleccionada no se encuentra dentro del tablero o no contiene ninguna pieza\n";
+			continue;
+		}
+
+		if(!isSameTeam(board[origen.row][origen.column], currentKing)){
+			cout << "No puedes mover una ficha del contrincante\n";
+			continue;
+		}
+
+		cout << "Ingrese la posicion a la que quiere mover la pieza (Ej.: e4)\n";	
+		cin >> input;
+		destino = parsePosition(input);
+
+		if(validMove(board, origen, destino) && validMovePiece(board, origen, destino)){
+			movePiece(board, origen, destino);
+		} else {
+			cout << "Movimiento invalido\n";
+			continue;
+		}
+
+		printBoard(board);
+
+		cont++;
 	}
-	printBoard(board);
 	return 0;
 }
