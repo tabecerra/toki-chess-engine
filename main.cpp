@@ -172,7 +172,6 @@ bool validMovePiece(char board[8][8], Position origin, Position target){
 
 bool isInCheck(char board[8][8], char currentKing){
 	Position kingPos;
-	bool inCheck = false;
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
 			if(board[i][j] == currentKing){
@@ -184,12 +183,46 @@ bool isInCheck(char board[8][8], char currentKing){
 	for(int i = 0; i < 8; i++){
 		for(int j = 0; j < 8; j++){
 			if(validMove(board, {j, i}, kingPos) && validMovePiece(board, {j, i}, kingPos)){
-				inCheck = true;
+				return true;
 			}
 		}
 	}
 	
-	return inCheck;
+	return false;
+}
+
+bool isCheckmate(char board[8][8], char currentKing){
+	if(!isInCheck(board, currentKing)){
+		return false;
+	}
+	char lastBoard[8][8];
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			lastBoard[i][j] = board[i][j];
+		}
+	}
+
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(isSameTeam(board[i][j], currentKing)){
+				for(int k = 0; k < 8; k++){
+					for(int l = 0; l < 8; l++){
+						if(validMove(board, {j, i}, {l, k}) && validMovePiece(board, {j, i}, {l, k})){
+							movePiece(board, {j, i}, {l, k});
+							bool savedKing = !isInCheck(board, currentKing);
+							for(int r = 0; r < 8; r++){
+								for(int c = 0; c < 8; c++){
+									board[r][c] = lastBoard[r][c];
+								}
+							}
+							if(savedKing) return false;
+						}
+					}
+				}
+			}
+		}
+	}
+	return true;
 }
 
 int main() {
@@ -255,6 +288,15 @@ int main() {
 			}
 			cout << "Ese movimiento no es posible porque se produce un jaque\n";
 			continue;
+		}
+
+		if(isCheckmate(board, (cont % 2 == 0) ? 'k' : 'K')){
+			if(cont % 2 == 0){
+				cout << "Jaque Mate! Ganan las BLANCAS\n";
+			} else {
+				cout << "Jaque Mate! Ganan las NEGRAS\n";
+			}
+			gameOver = true;
 		}
 
 		printBoard(board);
