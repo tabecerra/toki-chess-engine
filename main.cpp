@@ -167,6 +167,61 @@ bool validMovePiece(char board[8][8], Position origin, Position target){
 	}
 }
 
+bool isInCheck(char board[8][8], char currentKing){
+	Position kingPos;
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(board[i][j] == currentKing){
+				kingPos = {j, i};
+			}
+		}
+	}
+
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(validMove(board, {j, i}, kingPos) && validMovePiece(board, {j, i}, kingPos)){
+				return true;
+			}
+		}
+	}
+	
+	return false;
+}
+
+bool isCheckmate(char board[8][8], char currentKing){
+	if(!isInCheck(board, currentKing)){
+		return false;
+	}
+	char lastBoard[8][8];
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			lastBoard[i][j] = board[i][j];
+		}
+	}
+
+	for(int i = 0; i < 8; i++){
+		for(int j = 0; j < 8; j++){
+			if(isSameTeam(board[i][j], currentKing)){
+				for(int k = 0; k < 8; k++){
+					for(int l = 0; l < 8; l++){
+						if(validMove(board, {j, i}, {l, k}) && validMovePiece(board, {j, i}, {l, k})){
+							movePiece(board, {j, i}, {l, k});
+							bool savedKing = !isInCheck(board, currentKing);
+							for(int r = 0; r < 8; r++){
+								for(int c = 0; c < 8; c++){
+									board[r][c] = lastBoard[r][c];
+								}
+							}
+							if(savedKing) return false;
+						}
+					}
+				}
+			}
+		}
+	}
+	return true;
+}
+
 int main() {
 	char board[8][8] = {
 		{'r','n','b','q','k','b','n','r'},
@@ -186,6 +241,12 @@ int main() {
 	
 	while (!gameOver) {
 		char currentKing = (cont % 2 == 0) ? 'K' : 'k';
+		char lastBoard[8][8];
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				lastBoard[i][j] = board[i][j];
+			}
+		}
 		if(currentKing == 'K'){
 			cout << "Juegan las BLANCAS\n";
 		} else {
@@ -214,6 +275,25 @@ int main() {
 		} else {
 			cout << "Movimiento invalido\n";
 			continue;
+		}
+
+		if(isInCheck(board, currentKing)){
+			for(int i = 0; i < 8; i++){
+				for(int j = 0; j < 8; j++){
+					board[i][j] = lastBoard[i][j];
+				}
+			}
+			cout << "Ese movimiento no es posible porque se produce un jaque\n";
+			continue;
+		}
+
+		if(isCheckmate(board, (cont % 2 == 0) ? 'k' : 'K')){
+			if(cont % 2 == 0){
+				cout << "Jaque Mate! Ganan las BLANCAS\n";
+			} else {
+				cout << "Jaque Mate! Ganan las NEGRAS\n";
+			}
+			gameOver = true;
 		}
 
 		printBoard(board);
