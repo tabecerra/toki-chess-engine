@@ -222,6 +222,26 @@ bool isCheckmate(char board[8][8], char currentKing){
 	return true;
 }
 
+void checkPromotion(char board[8][8], Position target){
+	char pieceToPromote;
+	char piece = board[target.row][target.column];
+	bool isWhite = isupper(board[target.row][target.column]);
+	int promotionRow = isWhite ? 0 : 7;
+
+	if((piece == 'P' || piece == 'p') && target.row == promotionRow) {
+		cout << "Promocion! Elegi pieza (Q, R, B, N): ";
+		cin >> pieceToPromote;
+		pieceToPromote = toupper(pieceToPromote);
+		while (pieceToPromote != 'Q' && pieceToPromote != 'R' && pieceToPromote != 'B' && pieceToPromote != 'N') {
+			cout << "Opcion invalida. Elegi pieza (Q, R, B, N): ";
+			cin >> pieceToPromote;
+			pieceToPromote = toupper(pieceToPromote);
+		}
+		if(!isWhite) pieceToPromote = tolower(pieceToPromote);
+		board[target.row][target.column] = pieceToPromote;
+	}
+}
+
 int main() {
 	char board[8][8] = {
 		{'r','n','b','q','k','b','n','r'},
@@ -272,6 +292,7 @@ int main() {
 
 		if(validMove(board, origen, destino) && validMovePiece(board, origen, destino)){
 			movePiece(board, origen, destino);
+			checkPromotion(board, destino);
 		} else {
 			cout << "Movimiento invalido\n";
 			continue;
